@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عربيتك عندنا - تأجير سيارات</title>
+    
+    <style>
+        /* =================================
+           1. تنسيقات CSS (من ملف style.css)
+           ================================= */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            direction: rtl;
+            text-align: right;
+        }
+
+        header {
+            background-color: #0056b3;
+            color: white;
+            padding: 1em 0;
+            text-align: center;
+        }
+
+        header nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* تنسيقات قسم البحث */
+        .search-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        #search-form div {
+            display: inline-block;
+            margin-left: 20px;
+        }
+
+        #search-form input[type="date"], #search-form button {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        #search-form button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* تنسيقات قائمة السيارات */
+        #cars-listing {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .car-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            text-align: right;
+        }
+
+        .car-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .car-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .car-details {
+            padding: 15px;
+        }
+
+        .car-details h3 {
+            margin-top: 0;
+            color: #0056b3;
+        }
+
+        .car-details p {
+            margin: 5px 0;
+        }
+
+        .car-details .price {
+            font-weight: bold;
+            color: #e67e22;
+            font-size: 1.2em;
+        }
+
+        .car-details button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .car-details .book-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .car-details .admin-btn {
+            background-color: #6c757d;
+            color: white;
+            margin-right: 10px;
+        }
+
+        /* تنسيقات النوافذ المنبثقة (Modal) */
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+            text-align: right;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: left; 
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #booking-form input, #admin-image-form input, #booking-form button, #admin-image-form button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #booking-form button, #admin-image-form button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1em 0;
+            background-color: #333;
+            color: white;
+            /* تم إزالة خاصية fixed لتجنب التداخل مع المحتوى */
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    
+    <header>
+        <h1>عربيتك عندنا</h1>
+        <nav>
+            <a href="#">الرئيسية</a>
+            <a href="#cars-listing">السيارات المتاحة</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="search-section">
+            <h2>ابحث عن سيارتك</h2>
+            <form id="search-form">
+                <div>
+                    <label for="pickup-date">تاريخ الاستلام:</label>
+                    <input type="date" id="pickup-date" required>
+                </div>
+                <div>
+                    <label for="return-date">تاريخ التسليم:</label>
+                    <input type="date" id="return-date" required>
+                </div>
+                <button type="submit">بحث</button>
+            </form>
+        </section>
+        
+        <hr>
+
+        <section id="cars-listing">
+            <h2>السيارات المتاحة للإيجار</h2>
+            </section>
+
+        <div id="booking-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+                <h3>تأكيد الحجز</h3>
+                <h4 id="modal-car-name"></h4>
+                <form id="booking-form">
+                    <input type="hidden" id="booked-car-id">
+                    
+                    <label for="customer-name">اسم العميل:</label>
+                    <input type="text" id="customer-name" required>
+                    
+                    <label for="customer-phone">رقم الهاتف:</label>
+                    <input type="tel" id="customer-phone" required>
+                    
+                    <button type="submit">أكد الحجز</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="admin-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeAdminModal()">&times;</span>
+                <h3>تعديل صورة السيارة</h3>
+                <h4 id="admin-car-name"></h4>
+                <form id="admin-image-form">
+                    <input type="hidden" id="admin-car-id">
+                    
+                    <label for="new-image-url">رابط الصورة الجديد (URL):</label>
+                    <input type="url" id="new-image-url" required>
+                    
+                    <button type="submit">حفظ الصورة</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 عربيتك عندنا. جميع الحقوق محفوظة.</p>
+    </footer>
+
+    <script>
+        // ** 1. البيانات الافتراضية للسيارات **
+        let cars = [
+            { id: 1, make: 'Kia', model: 'Sportage', year: 2023, price: 150, available: true, image: 'https://i.ibb.co/601Jc9W/kia.jpg' },
+            { id: 2, make: 'Toyota', model: 'Corolla', year: 2022, price: 100, available: true, image: 'https://i.ibb.co/sK0tWbM/toyota-corolla.jpg' },
+            { id: 3, make: 'BMW', model: 'X5', year: 2024, price: 300, available: true, image: 'https://i.ibb.co/GdxhYw0/bmw-x5.jpg' },
+            { id: 4, make: 'Hyundai', model: 'Elantra', year: 2021, price: 80, available: true, image: 'https://i.ibb.co/pZ42sV2/hyundai.jpg' }
+        ];
+
+        // ** 2. وظائف Local Storage **
+        function loadCarsFromStorage() {
+            const storedCars = localStorage.getItem('carRentalCars');
+            if (storedCars) {
+                cars = JSON.parse(storedCars);
+            }
+        }
+
+        function saveCarsToStorage() {
+            localStorage.setItem('carRentalCars', JSON.stringify(cars));
+        }
+
+        // ** 3. وظيفة عرض السيارات في الواجهة **
+        function displayCars(carsArray = cars) {
+            const listingSection = document.getElementById('cars-listing');
+            listingSection.innerHTML = ''; 
+
+            carsArray.forEach(car => {
+                const card = document.createElement('div');
+                card.className = 'car-card';
+                
+                card.innerHTML = `
+                    <img src="${car.image}" alt="${car.make} ${car.model}">
+                    <div class="car-details">
+                        <h3>${car.make} ${car.model} (${car.year})</h3>
+                        <p>الحالة: <strong>${car.available ? 'متاحة' : 'مؤجرة'}</strong></p>
+                        <p class="price">السعر اليومي: ${car.price} جنيه</p>
+                        <button class="book-btn" onclick="openBookingModal(${car.id})" ${!car.available ? 'disabled' : ''}>
+                            ${car.available ? 'احجز الآن' : 'غير متاحة'}
+                        </button>
+                        <button class="admin-btn" onclick="openAdminModal(${car.id})">
+                            تعديل الصورة (Admin)
+                        </button>
+                    </div>
+                `;
+                listingSection.appendChild(card);
+            });
+        }
+
+        // ** 4. وظيفة البحث والتصفية (بسيطة) **
+        document.getElementById('search-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const pickupDate = new Date(document.getElementById('pickup-date').value);
+            const returnDate = new Date(document.getElementById('return-date').value);
+            
+            if (pickupDate >= returnDate) {
+                alert('تاريخ التسليم يجب أن يكون بعد تاريخ الاستلام!');
+                return;
+            }
+
+            const diffTime = Math.abs(returnDate - pickupDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            
+            alert(`تم البحث. مدة الإيجار المطلوبة هي ${diffDays} يوم. (يتم عرض السيارات المتاحة حالياً).`);
+            displayCars(cars.filter(car => car.available));
+        });
+
+        // ** 5. وظائف نافذة الحجز (Booking Modal) **
+        function openBookingModal(carId) {
+            const car = cars.find(c => c.id === carId);
+            if (!car) return;
+
+            document.getElementById('modal-car-name').textContent = `${car.make} ${car.model}`;
+            document.getElementById('booked-car-id').value = carId;
+            document.getElementById('booking-modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('booking-modal').style.display = 'none';
+        }
+
+        document.getElementById('booking-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const carId = parseInt(document.getElementById('booked-car-id').value);
+            const customerName = document.getElementById('customer-name').value;
+            const customerPhone = document.getElementById('customer-phone').value;
+            
+            const carIndex = cars.findIndex(c => c.id === carId);
+            
+            if (carIndex !== -1) {
+                cars[carIndex].available = false; 
+                saveCarsToStorage(); 
+                displayCars(); 
+                
+                alert(`تم حجز سيارة ${cars[carIndex].make} باسم ${customerName}! سنقوم بالاتصال بك على ${customerPhone}.`);
+                closeModal();
+            }
+        });
+
+        // ** 6. وظائف نافذة تعديل الصور للمسؤول (Admin Modal) **
+        function openAdminModal(carId) {
+            const car = cars.find(c => c.id === carId);
+            if (!car) return;
+
+            document.getElementById('admin-car-name').textContent = `${car.make} ${car.model}`;
+            document.getElementById('admin-car-id').value = carId;
+            document.getElementById('new-image-url').value = car.image; 
+            document.getElementById('admin-modal').style.display = 'block';
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').style.display = 'none';
+        }
+
+        document.getElementById('admin-image-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const carId = parseInt(document.getElementById('admin-car-id').value);
+            const newImageUrl = document.getElementById('new-image-url').value;
+            
+            const carIndex = cars.findIndex(c => c.id === carId);
+            
+            if (carIndex !== -1) {
+                cars[carIndex].image = newImageUrl; 
+                saveCarsToStorage(); 
+                displayCars(); 
+                
+                alert(`تم تحديث صورة سيارة ${cars[carIndex].make} بنجاح!`);
+                closeAdminModal();
+            }
+        });
+
+
+        // ** 7. تهيئة الصفحة عند التحميل **
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCarsFromStorage();
+            displayCars();
+        });
+    </script>
+</body>
+</html>
